@@ -38,7 +38,8 @@ def rootpage():
         session["id"] = makeid()
     
     return render_template('terminal-template.html',
-        title="Terminal Template"
+        caption = "Example",
+        title = "Terminal Template",
     )
     
 if __name__ == '__main__':
