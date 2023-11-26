@@ -3,6 +3,7 @@ import subprocess
 from http import HTTPStatus
 from flask import Flask, jsonify, redirect, render_template, request, url_for, session
 from webtools import StdoutPipe, Timeout, makeid
+import time
 
 app = Flask(__name__)
 app.secret_key = "SECRET_KEY"
@@ -12,8 +13,13 @@ outpipe:StdoutPipe = StdoutPipe()
 def submit():
     text = request.json['value']
     
+    outpipe.push(session["id"], {"type": "stdout", "out": f"Test message\n"})
     outpipe.push(session["id"], {"type": "stdout", "out": f"echo : {text}\n"})
-    outpipe.push(session["id"], {"type": "stderr", "out": f"echoerr : {text}\n"})
+    time.sleep(1)
+    outpipe.push(session["id"], {"type": "stdout", "out": f"count: 3\r"})
+    outpipe.push(session["id"], {"type": "stdout", "out": f"count: 2\r"})
+    outpipe.push(session["id"], {"type": "stdout", "out": f"count: 1\r"})
+    outpipe.push(session["id"], {"type": "stdout", "out": f"count: 0\n"})
     
     return jsonify({ "status": HTTPStatus.OK })
 

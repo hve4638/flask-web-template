@@ -24,15 +24,21 @@ async function submit() {
 
 async function loop() {
     while (true) {
-        const response = await fetch('/stdout', {
-            method : 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-        });
-        if (response.ok) {
-            const jsonData = await response.json();
-            terminal.add(jsonData["contents"])
+        try {
+            const response = await fetch('/stdout', {
+                method : 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+            });
+            if (response.ok) {
+                const jsonData = await response.json();
+                terminal.add(jsonData["contents"])
+            }
+        }
+        catch (error) {
+            terminal.add({"type":"stderr", "out":"Fail to fetch"});
+            break;
         }
     }
 }

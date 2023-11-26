@@ -1,6 +1,7 @@
 class Terminal {
     constructor(selector) {
         this.element = document.querySelector(selector);
+        this.reserve_carrige = false;
 
         this.element.onwheel = (e) => { 
             e.preventDefault();
@@ -39,16 +40,44 @@ class Terminal {
         }
     }
 
+    _cleanlastdiv() {
+        var lastdiv = this._lastdiv();
+        var col = lastdiv.firstChild.classList[0];
+
+        while (lastdiv.firstChild) {
+            lastdiv.removeChild(lastdiv.firstChild);
+        }
+        this._addspan(col)
+    }
+
     _split_and_add(full_text) {
-        const splited = full_text.split('\n');
-        const length = splited.length
+        const lines = full_text.split('\n');
+        const length = lines.length
 
         this._bottom_check();
 
-        for (var index in splited) {
-            this._write(splited[index])
+        if (this.reserve_carrige) {
+            this.reserve_carrige = false;
+            this._cleanlastdiv();
+        }
+
+        for (var index in lines) {
+            var linetext = lines[index];
+            var splite_carriage = linetext.split("\r");
+            
+            if (splite_carriage.length == 1) {
+                this._write(linetext);
+            }
+            else if (splite_carriage[splite_carriage.length-1] == "") {
+                this._write(splite_carriage[splite_carriage.length-2]);
+                this.reserve_carrige = true;
+            } else {
+                this._cleanlastdiv();
+                this._write(splite_carriage[splite_carriage.length-1]);
+            }
             
             if (index != length-1) {
+                this.reserve_carrige = false;
                 this._adddiv();
                 this._addspan();
             }
